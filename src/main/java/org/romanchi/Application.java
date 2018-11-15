@@ -1,11 +1,18 @@
 package org.romanchi;
 
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLClassLoader;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class Application {
@@ -49,14 +56,54 @@ public class Application {
 
         }
     }
-    public static void run(Class clazz) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        if(clazz.isAnnotationPresent(Scan.class)){
-            Scan scan = (Scan) clazz.getAnnotation(Scan.class);
-            String packageToScan = scan.packageToScan().replace(".","/");
-            scanFile(packageToScan,"org");
+    public static void run(Class clazz) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, ParserConfigurationException, SAXException, NoSuchFieldException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+        Document doc = documentBuilder.parse(new File(App.class.getClassLoader().getResource("context.xml").getFile()));
+        Element beans = doc.getDocumentElement();
+        boolean isAnnotationDriven = Boolean.valueOf(beans.getElementsByTagName("annotation-driven").item(0).getTextContent());
+        if(isAnnotationDriven){
+            if(clazz.isAnnotationPresent(Scan.class)){
+                Scan scan = (Scan) clazz.getAnnotation(Scan.class);
+                String packageToScan = scan.packageToScan().replace(".","/");
+                scanFile(packageToScan,"org");
+            }else{
+                logger.info("packageToScan is no present");
+            }
         }else{
-            logger.info("packageToScan is no present");
+            String packageBase = beans.getElementsByTagName("package-base").item(0).getTextContent();
+            NodeList beanList = doc.getElementsByTagName("bean");
+            for(int i = 0; i < beanList.getLength(); i++){
+                Node bean = beanList.item(i);
+                NamedNodeMap attributes = bean.getAttributes();
+                String beanClass = attributes.getNamedItem("class").getTextContent();
+                Class beanClazz = Class.forName(beanClass);
+                Object beanObject = context.getBean(beanClazz);
+                System.out.print(beanClass + "->");
+                String name = attributes.getNamedItem("name")==null ? null:attributes.getNamedItem("name").getTextContent();
+
+                if(bean.getChildNodes().getLength() > 0){
+                    NodeList childNodes = bean.getChildNodes();
+                    for(int k = 0; k < childNodes.getLength(); k++){
+                        Node node = childNodes.item(k);
+                        if(node.getNodeType() == Element.ELEMENT_NODE){
+                            Element propertyElement = (Element) node;
+                            String propertyName = node.getAttributes().getNamedItem("name").getTextContent();
+                            String value = node.getAttributes().getNamedItem("value") == null ? null : node.getAttributes().getNamedItem("value").getTextContent();
+                            if(value == null){
+                                Node innerBean = propertyElement.getElementsByTagName("bean").item(0);
+                                String innerBeanClass = innerBean.getAttributes().getNamedItem("class").getTextContent();
+                                Object beanToinject = context.getBean(innerBeanClass);
+                                Field fieldToInject = beanClazz.getDeclaredField(propertyName);
+                                fieldToInject.setAccessible(true);
+                                fieldToInject.set(beanObject, beanToinject);
+                            }
+                        }
+                    }
+                }
+            }
         }
+
     }
 
     public static ApplicationContext getContext() {

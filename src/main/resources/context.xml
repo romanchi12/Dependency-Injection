@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="contextschema.xsd">
+    <package-base>org.romanchi</package-base>
+    <annotation-driven>false</annotation-driven>
+    <bean class="org.romanchi.A">
+        <property name="b">
+            <bean class="org.romanchi.B">
+
+            </bean>
+        </property>
+    </bean>
+</beans>
