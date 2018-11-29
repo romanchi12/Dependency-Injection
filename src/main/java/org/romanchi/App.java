@@ -12,15 +12,13 @@ import java.util.HashSet;
 
 @Scan(packageToScan = "romanchi")
 public class App {
-    public static void main( String[] args ) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, ParserConfigurationException, SAXException, NoSuchFieldException {
+    public static void main( String[] args ) {
         Application.run(App.class);
         launch();
     }
-    public static void launch() throws IllegalAccessException, InstantiationException, InvocationTargetException, ClassNotFoundException {
-
+    public static void launch()  {
         ApplicationContext context = Application.getContext();
         A a = context.getBean(A.class);
         a.printB();
-
     }
 }
