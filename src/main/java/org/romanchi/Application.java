@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLClassLoader;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -22,19 +23,40 @@ public class Application {
     private static void scanClass(Class clazz) throws IllegalAccessException, InstantiationException, InvocationTargetException, ClassNotFoundException {
         Annotation[] classAnnotations = clazz.getAnnotations();
         Field[] declaredFields = clazz.getDeclaredFields();
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+        for(Method declaredMethod:declaredMethods){
+            Annotation[] methodAnnotations = declaredMethod.getAnnotations();
+            for(Annotation methodAnnotation:methodAnnotations){
+                if(methodAnnotation instanceof Bean){
+                    System.out.println(declaredMethod.getName());
+                    declaredMethod.setAccessible(true);
+                    Bean beanMethodAnnotation = (Bean) methodAnnotation;
+                    Class returnType = declaredMethod.getReturnType();
+                    String beanName = returnType.getCanonicalName();
+                    Object createdBeanForReturnType = declaredMethod.invoke(clazz.newInstance());
+                    System.out.println(((B)createdBeanForReturnType).value);
+                    context.setBean(beanName, createdBeanForReturnType);
+                }
+            }
+        }
         for(Field declaredField:declaredFields){
             Annotation[] fieldAnnotations = declaredField.getAnnotations();
             for(Annotation fieldAnnotation:fieldAnnotations){
                 if(fieldAnnotation instanceof Wired){
                     //wired detected
                     declaredField.setAccessible(true);
+                    Wired wiredFieldAnnotation = (Wired) fieldAnnotation;
+                    ScopeType scopeType = wiredFieldAnnotation.scope();
+                    System.out.println("scope: " + scopeType);
                     Class classToInject = declaredField.getType();
                     Object object = context.getBean(clazz);
-                    Object objectToInject = context.getBean(classToInject);
+                    Object objectToInject = context.getBean(classToInject, scopeType);
                     declaredField.set(object, objectToInject); // HERE WE NEED BEAN STORAGE
+                    declaredField.setAccessible(false);
                 }
             }
         }
+
     }
 
     private static void scanFile(String fileName, String accumulatedParentDir) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -67,6 +89,7 @@ public class Application {
                 Scan scan = (Scan) clazz.getAnnotation(Scan.class);
                 String packageToScan = scan.packageToScan().replace(".","/");
                 scanFile(packageToScan,"org");
+                scanFile(packageToScan, "org");
             }else{
                 logger.info("packageToScan is no present");
             }
@@ -79,7 +102,6 @@ public class Application {
                 String beanClass = attributes.getNamedItem("class").getTextContent();
                 Class beanClazz = Class.forName(beanClass);
                 Object beanObject = context.getBean(beanClazz);
-                System.out.print(beanClass + "->");
                 String name = attributes.getNamedItem("name")==null ? null:attributes.getNamedItem("name").getTextContent();
 
                 if(bean.getChildNodes().getLength() > 0){

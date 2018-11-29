@@ -1,10 +1,12 @@
 package org.romanchi;
 
-public class B {
+import java.util.Random;
 
+public class B {
+    int value = new Random().nextInt();
 
     @Override
     public String toString(){
-        return "Hello i am BI";
+        return "Hello i am BI, value = " + value;
     }
 }
