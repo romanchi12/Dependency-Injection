@@ -6,7 +6,7 @@
 
   <groupId>org.romanchi</groupId>
   <artifactId>core</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>3.3-SNAPSHOT</version>
 
   <name>core</name>
   <!-- FIXME change it to the project's website -->
@@ -62,4 +62,10 @@
       </plugins>
     </pluginManagement>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>internal</id>
+      <url>file://${project.build.directory}/mvn-repo</url>
+    </repository>
+  </distributionManagement>
 </project>
