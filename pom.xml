@@ -6,7 +6,7 @@
 
   <groupId>org.romanchi</groupId>
   <artifactId>core</artifactId>
-  <version>3.3-SNAPSHOT</version>
+  <version>3.8-SNAPSHOT</version>
 
   <name>core</name>
   <!-- FIXME change it to the project's website -->
@@ -25,6 +25,13 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.reflections/reflections -->
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.10</version>
+    </dependency>
+
   </dependencies>
 
   <build>

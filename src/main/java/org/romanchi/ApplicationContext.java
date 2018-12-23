@@ -1,8 +1,12 @@
 package org.romanchi;
 
+import org.reflections.Reflections;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ApplicationContext {
 
@@ -47,6 +51,17 @@ public class ApplicationContext {
     }
     public <T> T getBean(Class<T> tClass, ScopeType scopeType)  {
         String beanName = tClass.getCanonicalName();
+
+        /*if(tClass.isInterface()){
+            beanName = tClass.getCanonicalName();
+        }else{
+            if(tClass.getInterfaces().length == 1){
+                beanName = tClass.getInterfaces()[0].getCanonicalName();
+            }else {
+                beanName = tClass.getCanonicalName();
+            }
+        }
+        String beanName = tClass.getCanonicalName();*/
         return (T) getBean(beanName, scopeType);
     }
 
@@ -64,5 +79,23 @@ public class ApplicationContext {
     }
     public <T> T getBean(Class<T> tClass) {
         return getBean(tClass, ScopeType.SINGLETON);
+    }
+
+    public boolean containsBean(String beanName){
+        System.out.println("Contains" + beanName + " " + storage.containsKey(beanName));
+        return storage.containsKey(beanName);
+    }
+    public boolean containsBean(Class beanClass){
+        return containsBean(beanClass.getCanonicalName());
+    }
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("Context:{");
+        for(String key:storage.keySet()){
+            s.append(key + " : " + storage.get(key).hashCode() + ",\n");
+        }
+        s.append("}");
+        return s.toString();
     }
 }

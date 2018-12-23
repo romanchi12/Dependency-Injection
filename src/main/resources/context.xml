@@ -3,11 +3,12 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="contextschema.xsd">
     <package-base>org.romanchi</package-base>
     <annotation-driven>true</annotation-driven>
-    <bean class="org.romanchi.A">
+    <bean class="org.romanchi.DataSource">
         <property name="b">
-            <bean class="org.romanchi.B">
+            <bean class="org.romanchi.C">
 
             </bean>
         </property>
     </bean>
+
 </beans>
