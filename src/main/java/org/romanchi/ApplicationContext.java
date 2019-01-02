@@ -83,7 +83,6 @@ public class ApplicationContext {
     }
 
     public boolean containsBean(String beanName){
-        System.out.println("Contains" + beanName + " " + storage.containsKey(beanName));
         return storage.containsKey(beanName);
     }
     public boolean containsBean(Class beanClass){
@@ -93,7 +92,7 @@ public class ApplicationContext {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("Context:{");
+        s.append("Context:{\n");
         for(String key:storage.keySet()){
             Object bean = storage.get(key);
             s.append(key + " : " + storage.get(key).hashCode() + "=[");
@@ -101,7 +100,11 @@ public class ApplicationContext {
             for(Field beanField:beanFields){
                 try {
                     Object beanFieldValue = beanField.get(bean);
-                    s.append(beanField.getName() + " : " + beanFieldValue.hashCode());
+                    if(beanFieldValue !=null){
+                        s.append(beanField.getName() + " : " + beanFieldValue.hashCode());
+                    }else{
+                        s.append(beanField.getName() + " : null");
+                    }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
