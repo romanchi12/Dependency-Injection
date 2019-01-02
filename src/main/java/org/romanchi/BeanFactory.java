@@ -1,5 +1,7 @@
 package org.romanchi;
 
+import com.sun.org.apache.xpath.internal.Arg;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -18,22 +20,20 @@ public class BeanFactory {
     }
 
     public Object createBean(Class clazz, Object...args) throws InstantiationException, InvocationTargetException, IllegalAccessException {
-        Constructor[] constructors = clazz.getConstructors();
+        int constructorArgsLength = args.length;
+        Class[] constructorArgsTypes = new Class[constructorArgsLength];
+        for(int i = 0; i < constructorArgsLength; i++){
+            constructorArgsTypes[i] = args[i].getClass();
+        }
         Object bean = null;
-        for(Constructor constructor:constructors){
-            Class[] parametersTypes = constructor.getParameterTypes();
-            if(parametersTypes.length==args.length){
-                try {
-                    constructor.setAccessible(true);
-                    bean = constructor.newInstance(args);
-                }catch (InstantiationException e) {
-                        continue;
-                }
-            }
+        try {
+            Constructor constructor = clazz.getDeclaredConstructor(constructorArgsTypes);
+            constructor.setAccessible(true);
+            bean = constructor.newInstance(args);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } finally {
+            return bean;
         }
-        if(bean==null){
-            throw new InstantiationException("No such constructor present");
-        }
-        return bean;
     }
 }
