@@ -2,6 +2,7 @@ package org.romanchi;
 
 import org.reflections.Reflections;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -93,7 +94,18 @@ public class ApplicationContext {
         StringBuilder s = new StringBuilder();
         s.append("Context:{");
         for(String key:storage.keySet()){
-            s.append(key + " : " + storage.get(key).hashCode() + ",\n");
+            Object bean = storage.get(key);
+            s.append(key + " : " + storage.get(key).hashCode() + "=[");
+            Field[] beanFields = bean.getClass().getDeclaredFields();
+            for(Field beanField:beanFields){
+                try {
+                    Object beanFieldValue = beanField.get(bean);
+                    s.append(beanField.getName() + " : " + beanFieldValue.hashCode());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            s.append("]\n");
         }
         s.append("}");
         return s.toString();
