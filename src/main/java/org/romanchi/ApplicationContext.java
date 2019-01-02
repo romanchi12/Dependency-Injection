@@ -89,6 +89,7 @@ public class ApplicationContext {
     public boolean containsBean(Class beanClass){
         return containsBean(beanClass.getCanonicalName());
     }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();

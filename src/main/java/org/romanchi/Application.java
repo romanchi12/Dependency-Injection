@@ -51,6 +51,7 @@ public class Application {
                                 Object object = createFromFactoryMethod(method);
                                 field.setAccessible(true);
                                 field.set(createdObject, object);
+                                context.setBean(method.getReturnType().getCanonicalName(), object);
                                 break;
                             }
                         }
