@@ -58,6 +58,7 @@ public class Application {
                         if(!hasFactoryMethod){
                             Object object  = new BeanFactory().createBean(fieldType);
                             context.setBean(fieldType.getCanonicalName(), object);
+                            field.setAccessible(true);
                             field.set(createdObject, object);
                         }
                     }

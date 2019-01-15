@@ -99,6 +99,7 @@ public class ApplicationContext {
             Field[] beanFields = bean.getClass().getDeclaredFields();
             for(Field beanField:beanFields){
                 try {
+                    beanField.setAccessible(true);
                     Object beanFieldValue = beanField.get(bean);
                     if(beanFieldValue !=null){
                         s.append(beanField.getName() + " : " + beanFieldValue.hashCode());

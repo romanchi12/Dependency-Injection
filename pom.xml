@@ -6,7 +6,7 @@
 
   <groupId>org.romanchi</groupId>
   <artifactId>core</artifactId>
-  <version>3.8-SNAPSHOT</version>
+  <version>4.2-SNAPSHOT</version>
 
   <name>core</name>
   <!-- FIXME change it to the project's website -->
@@ -30,6 +30,20 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.9.10</version>
+
+      <exclusions>
+        <exclusion>
+          <groupId>org.javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
+
+    </dependency>
+
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.20.0-GA</version>
     </dependency>
 
   </dependencies>
